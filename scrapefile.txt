@@ -1,0 +1,182 @@
+# Scrape Zone
+
+
+curl -L -O https://artifacts.elastic.co/downloads/beats/elastic-agent/elastic-agent-8.9.0-linux-x86_64.tar.gz
+tar xzvf elastic-agent-8.9.0-linux-x86_64.tar.gz
+cd elastic-agent-8.9.0-linux-x86_64
+sudo ./elastic-agent install --non-interactive
+/home/agent/elastic-agent-8.9.0-linux-x86_64/elastic-agent run -c ./elastic-agent.yml &;
+
+
+curl -L -O https://artifacts.elastic.co/downloads/beats/elastic-agent/elastic-agent-8.9.0-linux-x86_64.tar.gz
+tar xzvf elastic-agent-8.9.0-linux-x86_64.tar.gz
+cd elastic-agent-8.9.0-linux-x86_64
+sudo ./elastic-agent install --url=https://fleetserver:443 --enrollment-token=UlhfV1hJb0JJZ19uTi1Wb2J3WnA6MFp4MjI4NE5UUWVralp3VWZZZTlpZw==
+
+echo -n 'Line of text' | nc -v localhost 50000
+
+
+ 	  - FLEET_ENROLLMENT_TOKEN=UlhfV1hJb0JJZ19uTi1Wb2J3WnA6MFp4MjI4NE5UUWVralp3VWZZZTlpZw==
+      - FLEET_ENROLL=1
+      - FLEET_URL=https://fleetserver:443
+      - ELASTICSEARCH_HOST=https://es01:9200
+      - ELASTICSEARCH_USERNAME=elastic
+      - ELASTICSEARCH_PASSWORD=password
+
+            - ELASTICSEARCH_HOST=https://es01:9200
+      - ELASTICSEARCH_USERNAME=elastic
+      - ELASTICSEARCH_PASSWORD=password
+      - ELASTICSEARCH_CA=/usr/share/elastic-agent/certs/ca/ca.crt
+
+
+
+ fleetserver:
+    image: docker.elastic.co/beats/elastic-agent:8.9.1 
+    container_name: fleetserver
+    depends_on:
+      es01:
+        condition: service_healthy
+    restart: always
+    user: root # note, synthetic browser monitors require this set to `elastic-agent`
+    environment:
+      - FLEET_SERVER_ENABLE=true 
+      - FLEET_SERVER_ELASTICSEARCH_HOST=https://es01:9200
+      - FLEET_SERVER_SERVICE_TOKEN=AAEAAWVsYXN0aWMvZmxlZXQtc2VydmVyL3Rva2VuLTE2OTM4Mjk5MTA0MzY6VzVPOU1uelBTWWFCeHlDNmQwYUIwQQ
+      - FLEET_SERVER_POLICY_ID=fleet-server-policy
+      - FLEET_SERVER_ELASTICSEARCH_CA=/usr/share/elastic-agent/certs/ca/ca.crt
+      - FLEET_SERVER_PORT=8220
+      - FLEET_ENROLLMENT_TOKEN=MTV0VFlZb0JqYjdzOEQwNnh2VUQ6VVAzUjFNYzFSM1NfZUpwWkxGUWxydw==
+      - FLEET_ENROLL=1
+    ports:
+      - 8220:8220
+    volumes:
+      - certs:/usr/share/elastic-agent/certs
+
+
+            - FLEET_SERVER_ELASTICSEARCH_CA_TRUSTED_FINGERPRINT=DD:64:98:D6:DA:8E:32:5D:91:63:3B:C5:94:21:96:55:AE:1D:78:D5:F0:C6:1C:CD:08:F1:31:42:84:63:FA:62
+
+
+            openssl x509 -fingerprint -sha256 -in ./certs/es01/es01.crt -outform DER | openssl dgst -sha256 -hex
+(stdin)= 0a325fe1cac5c8a1dfa4eacca6907185d79c8609294874ce872981801d554962
+
+# curl -L -O https://artifacts.elastic.co/downloads/beats/elastic-agent/elastic-agent-8.8.0-linux-x86_64.tar.gz
+tar xzvf elastic-agent-8.8.0-linux-x86_64.tar.gz
+cd elastic-agent-8.8.0-linux-x86_64
+sudo ./elastic-agent install --url=https://$IP:8220 \
+  --fleet-server-es=https://$IP:9200 \
+  --fleet-server-service-token=$SERVICE_TOKEN \
+  --fleet-server-policy=fleet-server-policy \
+  --fleet-server-es-ca-trusted-fingerprint=$ES_FINGERPRINT \
+  --certificate-authorities=/tmp/ca/ca.crt \
+  --fleet-server-cert=/tmp/fleet-server/fleet-server.crt \
+  --fleet-server-cert-key=/tmp/fleet-server/fleet-server.key \
+  --fleet-server-port=8220
+(stdin)= eab2c5710a3520f0c085966142a7d9d11000a5feb2f001cc0afeb535e9011f87
+
+
+ user: root # note, synthetic browser monitors require this set to `elastic-agent`
+    environment:
+      - FLEET_SERVER_ENABLE=1
+      - ELASTICSEARCH_CA=/usr/share/elastic-agent/certs/ca/ca.crt
+      - FLEET_SERVER_ELASTICSEARCH_HOST=https://es01:9200
+      - FLEET_SERVER_ELASTICSEARCH_CA=/usr/share/elastic-agent/certs/ca/ca.crt
+#      - FLEET_SERVER_CERT=/usr/share/elastic-agent/config/certs/fleet/fleetserver.crt
+#      - FLEET_SERVER_CERT_KEY=/usr/share/elastic-agent/config/certs/fleet/fleetserver.key
+      - ELASTICSEARCH_USERNAME=elastic
+      - ELASTICSEARCH_PASSWORD=${ELASTIC_PASSWORD}
+      - FLEET_SERVER_SERVICE_TOKEN=AAEAAWVsYXN0aWMvZmxlZXQtc2VydmVyL3Rva2VuLTE2OTM4NTY3NTA1OTk6YmhiWms3ZkhRQ0NYckhqZUFSbFN5Zw
+      - FLEET_SERVER_POLICY_ID=fleet-server-policy
+      - FLEET_ENROLLMENT_TOKEN=MTV0VFlZb0JqYjdzOEQwNnh2VUQ6VVAzUjFNYzFSM1NfZUpwWkxGUWxydw==
+      - FLEET_ENROLL=1
+      - FLEET_SERVER_INSECURE_HTTP=true
+ # #     - FLEET_SERVER_ELASTICSEARCH_CA_TRUSTED_FINGERPRINT=0a325fe1cac5c8a1dfa4eacca6907185d79c8609294874ce872981801d554962
+ #     - FLEET_SERVER_HOST=https://fleetserver:8220
+ #     - FLEET_SERVER_PORT=8220
+ #     - KIBANA_FLEET_HOST=http://kibana:5601
+
+
+
+ curl -L -O https://artifacts.elastic.co/downloads/beats/elastic-agent/elastic-agent-8.8.0-linux-x86_64.tar.gz
+tar xzvf elastic-agent-8.8.0-linux-x86_64.tar.gz
+cd elastic-agent-8.8.0-linux-x86_64
+sudo ./elastic-agent install --url=https://$IP:8220 \
+  --fleet-server-es=https://$IP:9200 \
+  --fleet-server-service-token=$SERVICE_TOKEN \
+  --fleet-server-policy=fleet-server-policy \
+  --fleet-server-es-ca-trusted-fingerprint=$ES_FINGERPRINT \
+  --certificate-authorities=/tmp/ca/ca.crt \
+  --fleet-server-cert=/tmp/fleet-server/fleet-server.crt \
+  --fleet-server-cert-key=/tmp/fleet-server/fleet-server.key \
+  --fleet-server-port=8220
+
+
+  sh-5.0$ openssl x509 -fingerprint -sha256 -in ./config/certs/ca/ca.crt -outform DER | openssl dgst -sha256 -hex
+(stdin)= eab2c5710a3520f0c085966142a7d9d11000a5feb2f001cc0afeb535e9011f87
+
+
+
+ fleetserver:
+    image: docker.elastic.co/beats/elastic-agent:${STACK_VERSION}
+    container_name: fleetserver
+    depends_on:
+      es01:
+        condition: service_healthy
+      kibana:
+        condition: service_healthy
+    restart: always
+    user: root # note, synthetic browser monitors require this set to `elastic-agent`
+    environment:
+      - FLEET_SERVER_ENABLE=1
+      - FLEET_SERVER_ELASTICSEARCH_HOST=https://es01:9200
+      - FLEET_SERVER_ELASTICSEARCH_CA=/usr/share/elastic-agent/certs/ca/ca.crt
+      - ELASTICSEARCH_USERNAME=elastic
+      - ELASTICSEARCH_PASSWORD=${ELASTIC_PASSWORD}"
+      - FLEET_SERVER_SERVICE_TOKEN=AAEAAWVsYXN0aWMvZmxlZXQtc2VydmVyL3Rva2VuLTE2OTM5MDY1MTc2Mzc6QXNnS1ZXQWZSV3lNT0puT3I4Tk1UQQ
+      - FLEET_SERVER_POLICY_ID=fleet-server-policy
+      - FLEET_SERVER_ELASTICSEARCH_CA_TRUSTED_FINGERPRINT=eab2c5710a3520f0c085966142a7d9d11000a5feb2f001cc0afeb535e9011f87
+      - FLEET_ENROLL=1
+      - FLEET_ENROLLMENT_TOKEN=cmJxc1pJb0JvcFBpMWdZZE9nbGw6Tzk5bTdITWhRcWllaVZFMURrRlhrdw==      
+      - FLEET_URL=https://fleetserver:8220
+      - FLEET_SERVER_INSECURE_HTTP=1
+      - FLEET_SERVER_PORT=8220
+      - FLEET_SERVER_CERT=/usr/share/elastic-agent/certs/fleetserver/fleetserver.crt
+      - FLEET_SERVER_CERT_KEY=/usr/share/elastic-agent/certs/fleetserver/fleetserver.key
+    ports:
+      - 8220:8220
+    volumes:
+      - certs:/usr/share/elastic-agent/certs
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "curl -s -I --cacert config/certs/ca/ca.crt https://fleet:8220 | grep -q 'HTTP/2 404'",
+        ]
+      interval: 10s
+      timeout: 10s
+      retries: 120
+
+
+
+
+
+# curl --cacert /usr/share/elastic-agent/certs/ca/ca.crt -u elastic:password  https://es01:9200
+{
+  "name" : "es01",
+  "cluster_name" : "docker-cluster",
+  "cluster_uuid" : "WA1UIjJGQeiaxltN3B4QrA",
+  "version" : {
+    "number" : "8.9.1",
+    "build_flavor" : "default",
+    "build_type" : "docker",
+    "build_hash" : "a813d015ef1826148d9d389bd1c0d781c6e349f0",
+    "build_date" : "2023-08-10T05:02:32.517455352Z",
+    "build_snapshot" : false,
+    "lucene_version" : "9.7.0",
+    "minimum_wire_compatibility_version" : "7.17.0",
+    "minimum_index_compatibility_version" : "7.0.0"
+  },
+  "tagline" : "You Know, for Search"
+}
+
+
+/usr/share/elastic-agent/elastic-agent status
