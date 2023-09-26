@@ -453,6 +453,7 @@ inputs:
       - id: tcp-tcp.generic-d0690b6c-f23c-417b-a3a9-e07c7ce4ff9e
         data_stream:
           dataset: tcp.generic
+        pipeline: logs-tcp.generic@custom
         host: '0.0.0.0:8500'
         ssl: null
 secret_references: []

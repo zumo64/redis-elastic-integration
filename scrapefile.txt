@@ -180,3 +180,365 @@ sudo ./elastic-agent install --url=https://$IP:8220 \
 
 
 /usr/share/elastic-agent/elastic-agent status
+
+
+
+[
+  {
+    "_source": {
+      "message": "{\"ts\":1694700257,\"new_int_conn\":{\"id\":1000000044210001002 ,\"srcip\":\"127.0.0.1\",\"srcp\":\"45686\",\"trgip\":\"127.0.0.1\",\"trgp\":\"3333\",\"hname\":\"\",\"bdb_name\":\"zumo-test-db1\",\"bdb_uid\":\"1\"}}"
+    }
+  }
+]
+
+
+
+[
+  {
+    "_source": {
+    "message":"{\"ts\":1655821384,\"action\":\"auth\",\"id\":2285001002 ,\"srcip\":\"127.0.0.1\",\"srcp\":\"39338\",\"trgip\":\"127.0.0.1\",\"trgp\":\"12635\",\"hname\":\"\",\"bdb_name\":\"DB1\",\"bdb_uid\":\"5\",\"status\":2,\"username\":\"user_one\",\"identity\":\"user:1\",\"acl-rules\":\"~* +@all\"}"
+    }    
+  }
+]
+
+
+
+
+
+
+---------------
+painless script
+
+void renameField(def ctx, def old, def newF) {
+   def names = old.splitOnToken(".");
+   def value = ctx[names[0]][names[1]];
+   ctx[newF] = value ;
+}
+
+def fields = ctx.keySet();
+def type = null;
+
+for (field in fields) {
+
+  if (field.contains("new_int_conn")) {
+    type = "Internal Connection";
+    
+    renameField(ctx,"new_int_conn.id","proxy_connection_id");
+    renameField(ctx,"new_int_conn.srcip","srcip");
+    renameField(ctx,"new_int_conn.srcp","srcp");
+    renameField(ctx,"new_int_conn.trgip","trgip");
+    renameField(ctx,"new_int_conn.trgp","trgp");
+    renameField(ctx,"new_int_conn.hname","hname");
+    renameField(ctx,"new_int_conn.bdb_name","bdb_name");
+    renameField(ctx,"new_int_conn.bdb_uid","bdb_uid");
+    break;
+  }
+  else if (field.contains("new_conn")) {
+    type = "External Connection";
+   
+    renameField(ctx,"new_conn.id","proxy_connection_id");
+    renameField(ctx,"new_conn.srcip","srcip");
+    renameField(ctx,"new_conn.srcp","srcp");
+    renameField(ctx,"new_conn.trgip","trgip");
+    renameField(ctx,"new_conn.trgp","trgp");
+    renameField(ctx,"new_conn.hname","hname");
+    renameField(ctx,"new_conn.bdb_name","bdb_name");
+    renameField(ctx,"new_conn.bdb_uid","bdb_uid");
+
+    break;
+  }
+  else if (field.contains("close_conn")) {
+    type = "Close Connection";
+   
+    renameField(ctx,"close_conn.id","proxy_connection_id");
+    renameField(ctx,"close_conn.srcip","srcip");
+    renameField(ctx,"close_conn.srcp","srcp");
+    renameField(ctx,"close_conn.trgip","trgip");
+    renameField(ctx,"close_conn.trgp","trgp");
+    renameField(ctx,"close_conn.hname","hname");
+    renameField(ctx,"close_conn.bdb_name","bdb_name");
+    renameField(ctx,"close_conn.bdb_uid","bdb_uid");
+    break;
+  }
+  else if (field.contains("action")) {
+    type = "Auth";
+    
+    def value = ctx["id"];
+    ctx["proxy_connection_id"] = value ;
+    break;
+  }
+  
+}
+
+fields = null;
+
+if (type == "Internal Connection" ) {
+  ctx.entrySet().removeIf(e -> e.getKey() =~ /new_int_conn.*/);
+}
+else  if (type == "External Connection" ) {
+  ctx.entrySet().removeIf(e -> e.getKey() =~ /new_conn.*/);
+}
+else if (type == "Close Connection" ) {
+  ctx.entrySet().removeIf(e -> e.getKey() =~ /close_conn.*/);
+}
+
+ctx["redis_audit_event_type"] = type;
+
+
+--------
+Hed
+number of connections by IP 
+how many connections we have from this IP at a certain time
+
+
+Bonjour Madame Haristoy,
+
+Le 1404 dernier j'étais passé avec ma mère  et ma femme pour signer  une procuration pour que ma mère Elsa Zumbiehl puisse accéder à mon coffre que je loue à l'agence de Biarritz.
+Je viens de recevoir une lettre de l'agence de Biarritz me disant que le Mandat de procuration n'est   pas conforme au motif  "Mandat non régularisé depuis 105 jours" 
+
+Pour votre info, Nous avions fait une première procuration l'année dernière qui avait été également invalidée. Est ce que cette lettre fait référence à cette première procuration ?   
+
+Pourriez vous s'il vous plait me confirmer que ma mère et ma femme (Isabelle de Langeron) ont bien accès au coffre ? 
+
+ci joint un scan de la lettre que j'ai reçue hier..
+Merci d'avance pour votre aide,
+
+Christian
+
+
+
+
+PIPELINE 
+
+[
+  {
+    "json": {
+      "field": "message",
+      "add_to_root": true
+    }
+  },
+  {
+    "script": {
+      "lang": "painless",
+      "source": "\nvoid renameField(def ctx, def old, def newF) {\n   def names = old.splitOnToken(\".\");\n   def value = ctx[names[0]][names[1]];\n   ctx[newF] = value ;\n}\n\ndef fields = ctx.keySet();\ndef type = null;\n\nfor (field in fields) {\n\n  if (field.contains(\"new_int_conn\")) {\n    type = \"Internal Connection\";\n    \n    renameField(ctx,\"new_int_conn.id\",\"proxy_connection_id\");\n    renameField(ctx,\"new_int_conn.srcip\",\"srcip\");\n    renameField(ctx,\"new_int_conn.srcp\",\"srcp\");\n    renameField(ctx,\"new_int_conn.trgip\",\"trgip\");\n    renameField(ctx,\"new_int_conn.trgp\",\"trgp\");\n    renameField(ctx,\"new_int_conn.hname\",\"hname\");\n    renameField(ctx,\"new_int_conn.bdb_name\",\"bdb_name\");\n    renameField(ctx,\"new_int_conn.bdb_uid\",\"bdb_uid\");\n    break;\n  }\n  else if (field.contains(\"new_conn\")) {\n    type = \"External Connection\";\n   \n    renameField(ctx,\"new_conn.id\",\"proxy_connection_id\");\n    renameField(ctx,\"new_conn.srcip\",\"srcip\");\n    renameField(ctx,\"new_conn.srcp\",\"srcp\");\n    renameField(ctx,\"new_conn.trgip\",\"trgip\");\n    renameField(ctx,\"new_conn.trgp\",\"trgp\");\n    renameField(ctx,\"new_conn.hname\",\"hname\");\n    renameField(ctx,\"new_conn.bdb_name\",\"bdb_name\");\n    renameField(ctx,\"new_conn.bdb_uid\",\"bdb_uid\");\n\n    break;\n  }\n  else if (field.contains(\"close_conn\")) {\n    type = \"Close Connection\";\n   \n    renameField(ctx,\"close_conn.id\",\"proxy_connection_id\");\n    renameField(ctx,\"close_conn.srcip\",\"srcip\");\n    renameField(ctx,\"close_conn.srcp\",\"srcp\");\n    renameField(ctx,\"close_conn.trgip\",\"trgip\");\n    renameField(ctx,\"close_conn.trgp\",\"trgp\");\n    renameField(ctx,\"close_conn.hname\",\"hname\");\n    renameField(ctx,\"close_conn.bdb_name\",\"bdb_name\");\n    renameField(ctx,\"close_conn.bdb_uid\",\"bdb_uid\");\n    break;\n  }\n  else if (field.contains(\"action\")) {\n    type = \"Auth\";\n    \n    def value = ctx[\"id\"];\n    ctx[\"proxy_connection_id\"] = value ;\n    break;\n  }\n  \n}\n\nfields = null;\n\nif (type == \"Internal Connection\" ) {\n  ctx.entrySet().removeIf(e -> e.getKey() =~ /new_int_conn.*/);\n}\nelse  if (type == \"External Connection\" ) {\n  ctx.entrySet().removeIf(e -> e.getKey() =~ /new_conn.*/);\n}\nelse if (type == \"Close Connection\" ) {\n  ctx.entrySet().removeIf(e -> e.getKey() =~ /close_conn.*/);\n}\n\nctx[\"redis_audit_event_type\"] = type;\n         "
+    }
+  },
+  {
+    "date": {
+      "field": "ts",
+      "formats": [
+        "UNIX"
+      ]
+    }
+  }
+]
+
+
+
+TRANSFORM 
+
+Preview
+{
+  "id": "redis_audit_logs_connection_times_cont",
+  "authorization": {
+    "roles": [
+      "superuser"
+    ]
+  },
+  "version": "8.9.1",
+  "create_time": 1694947696144,
+  "source": {
+    "index": [
+      "logs-*"
+    ],
+    "query": {
+      "bool": {
+        "filter": [
+          {
+            "bool": {
+              "filter": [
+                {
+                  "bool": {
+                    "must": [],
+                    "filter": [
+                      {
+                        "bool": {
+                          "should": [
+                            {
+                              "term": {
+                                "data_stream.dataset": {
+                                  "value": "tcp.generic"
+                                }
+                              }
+                            }
+                          ],
+                          "minimum_should_match": 1
+                        }
+                      }
+                    ],
+                    "should": [],
+                    "must_not": []
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    }
+  },
+  "dest": {
+    "index": "redis_audit_logs_connection_time_spans"
+  },
+  "sync": {
+    "time": {
+      "field": "@timestamp",
+      "delay": "60s"
+    }
+  },
+  "pivot": {
+    "group_by": {
+      "proxy_connection_id": {
+        "terms": {
+          "field": "proxy_connection_id"
+        }
+      },
+      "srcip": {
+        "terms": {
+          "field": "srcip"
+        }
+      }
+    },
+    "aggregations": {
+      "@timestamp.min": {
+        "min": {
+          "field": "@timestamp"
+        }
+      },
+      "@timestamp.max": {
+        "max": {
+          "field": "@timestamp"
+        }
+      }
+    }
+  },
+  "description": "Track the min - max times for each connection",
+  "settings": {}
+}
+
+ 
+
+
+18/09/2023
+
+PUT _transform/redis-external-connections_v2
+{
+
+  "source": {
+    "index": [
+      "logs-*"
+    ],
+    "query": {
+      "bool": {
+        "filter": [
+          {
+            "bool": {
+              "filter": [
+                {
+                  "bool": {
+                    "must": [],
+                    "filter": [
+                      {
+                        "bool": {
+                          "should": [
+                            {
+                              "term": {
+                                "data_stream.dataset": {
+                                  "value": "tcp.generic"
+                                }
+                              }
+                            }
+                          ],
+                          "minimum_should_match": 1
+                        }
+                      }
+                    ],
+                    "should": [],
+                    "must_not": [
+                      {
+                        "match_phrase": {
+                          "redis_audit_event_type": "Internal Connection"
+                        }
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    }
+  },
+  "dest": {
+    "index": "redis-external-connections"
+  },
+  "sync": {
+    "time": {
+      "field": "@timestamp",
+      "delay": "60s"
+    }
+  },
+  "pivot": {
+    "group_by": {
+      "proxy_connection_id": {
+        "terms": {
+          "field": "proxy_connection_id"
+        }
+      },
+      "bdb_name": {
+        "terms": {
+          "field": "bdb_name"
+        }
+      },
+      "srcip": {
+        "terms": {
+          "field": "srcip"
+        }
+      },
+      "srcp": {
+        "terms": {
+          "field": "srcp"
+        }
+      }
+    },
+    "aggregations": {
+      "@timestamp.max": {
+        "max": {
+          "field": "@timestamp"
+        }
+      },
+      "@timestamp.min": {
+        "min": {
+          "field": "@timestamp"
+        }
+      },
+      "redis_audit_event_type.cardinality": {
+        "cardinality": {
+          "field": "redis_audit_event_type"
+        }
+      },
+      "redis_audit_event_type.terms": {
+        "terms": {
+          "field": "redis_audit_event_type",
+          "size": 3
+        }
+      }
+    }
+  },
+  "description": "tracks external connections time spans with event types",
+  "settings": {}
+}
+
+Connextion  open at a given time
+@timestamp.max >= "2023-09-18T15:16:00.000"

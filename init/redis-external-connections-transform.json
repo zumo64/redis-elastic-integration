@@ -1,0 +1,141 @@
+{
+  "id": "redis-external-connections_v4",
+  "authorization": {
+    "roles": [
+      "superuser"
+    ]
+  },
+  "version": "8.9.1",
+  "create_time": 1695398631607,
+  "source": {
+    "index": [
+      "logs-*"
+    ],
+    "query": {
+      "bool": {
+        "filter": [
+          {
+            "bool": {
+              "filter": [
+                {
+                  "bool": {
+                    "filter": [
+                      {
+                        "bool": {
+                          "filter": [
+                            {
+                              "bool": {
+                                "must": [],
+                                "filter": [
+                                  {
+                                    "bool": {
+                                      "should": [
+                                        {
+                                          "term": {
+                                            "data_stream.dataset": {
+                                              "value": "tcp.generic"
+                                            }
+                                          }
+                                        }
+                                      ],
+                                      "minimum_should_match": 1
+                                    }
+                                  }
+                                ],
+                                "should": [],
+                                "must_not": [
+                                  {
+                                    "match_phrase": {
+                                      "redis_audit_event_type": "Internal Connection"
+                                    }
+                                  }
+                                ]
+                              }
+                            }
+                          ]
+                        }
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    }
+  },
+  "dest": {
+    "index": "redis-external-connections"
+  },
+  "sync": {
+    "time": {
+      "field": "@timestamp",
+      "delay": "60s"
+    }
+  },
+  "pivot": {
+    "group_by": {
+      "proxy_connection_id": {
+        "terms": {
+          "field": "proxy_connection_id"
+        }
+      },
+      "bdb_name": {
+        "terms": {
+          "field": "bdb_name"
+        }
+      },
+      "srcip": {
+        "terms": {
+          "field": "srcip"
+        }
+      },
+      "srcp": {
+        "terms": {
+          "field": "srcp"
+        }
+      }
+    },
+    "aggregations": {
+      "@timestamp.max": {
+        "max": {
+          "field": "@timestamp"
+        }
+      },
+      "@timestamp.min": {
+        "min": {
+          "field": "@timestamp"
+        }
+      },
+      "redis_audit_event_type.cardinality": {
+        "cardinality": {
+          "field": "redis_audit_event_type"
+        }
+      },
+      "redis_audit_event_type.terms": {
+        "terms": {
+          "field": "redis_audit_event_type",
+          "size": 3
+        }
+      },
+      "duration": {
+        "bucket_script": {
+          "buckets_path": {
+            "min": "@timestamp.min.value",
+            "max": "@timestamp.max.value"
+          },
+          "script": "params.max - params.min"
+        }
+      },
+      "status.terms": {
+        "terms": {
+          "field": "status",
+          "size": 10
+        }
+      }
+    }
+  },
+  "description": "tracks external connections time spans with event types",
+  "settings": {}
+}

@@ -139,19 +139,24 @@ services:
       retries: 120
 
 
-  #Node 1
-  # TODO add the cluster  + db creation commands on container creation
   re1:
-    image: redislabs/redis:6.4.2-94
+    #image: redislabs/redis:6.4.2-94
+    image: redislabs/redis:latest
     container_name: re1
     restart: unless-stopped
     tty: true
     cap_add: 
       - sys_resource
     ports:
-      - "18443:8443"
-      - "12000:12000"
-      - "19443:9443"
+      - 18443:8443
+      - 12000:12000
+      - 19443:9443
+      - 10670:10670
+      - 10671:10671
+    mem_limit: 4000m
+    volumes:
+      - ./test:/tmp
+
 
 
 

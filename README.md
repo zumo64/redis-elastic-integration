@@ -32,9 +32,9 @@ rladmin cluster create name cluster.local username redis@redis.com password redi
 
 
 # create a DB
-curl -X POST -H 'cache-control: no-cache' -H 'Content-type: application/json' -u redis@redis.com:redis -d '{ "bdb": {"name": "zumo-test-db1","type": "redis","memory_size": 100,"shards_count":1, "authentication_redis_pass":"redis", "port" : 10670 }}' -k https://localhost:9443/v2/bdbs
+curl -X POST -H 'cache-control: no-cache' -H 'Content-type: application/json' -u redis@redis.com:redis -d '{ "bdb": {"name": "zumo-test-db1","type": "redis","memory_size": 1000000,"shards_count":1, "authentication_redis_pass":"redis", "port" : 10670 }}' -k https://localhost:9443/v2/bdbs
 
-curl -X POST -H 'cache-control: no-cache' -H 'Content-type: application/json' -u redis@redis.com:redis -d '{ "bdb": {"name": "zumo-test-db2","type": "redis","memory_size": 100,"shards_count":1, "authentication_redis_pass":"redis", "port" : 10671 }}' -k https://localhost:9443/v2/bdbs
+curl -X POST -H 'cache-control: no-cache' -H 'Content-type: application/json' -u redis@redis.com:redis -d '{ "bdb": {"name": "zumo-test-db2","type": "redis","memory_size": 1000000,"shards_count":1, "authentication_redis_pass":"redis", "port" : 10671 }}' -k https://localhost:9443/v2/bdbs
 
 rladmin cluster config auditing db_conns audit_protocol TCP audit_address esagent audit_port 8500
 rladmin tune db db:1 db_conns_auditing enabled
@@ -45,10 +45,10 @@ rladmin tune cluster db_conns_auditing enabled
 
 
 # memtier
-memtier_benchmark -s localhost -p 10670 -a redis --hide-histogram --pipeline=5 --threads=6 --test-time=40
+memtier_benchmark -s localhost -p 10670 -a redis --hide-histogram --pipeline=5 --threads=6 --test-time=20
 
 #
-memtier_benchmark -s localhost -p 10671 -a redis --hide-histogram --pipeline=5 --threads=6 --test-time=40
+memtier_benchmark -s localhost -p 10671 -a redis --hide-histogram --pipeline=5 --threads=6 --test-time=20
 
 
 

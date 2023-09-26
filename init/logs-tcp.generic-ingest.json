@@ -1,0 +1,26 @@
+# Ingest Pipeline inlude 3 processors 
+# JSON converts the JSON inside the incoming message
+# Script (painless) to flatten the event logs 
+# Date
+[
+  {
+    "json": {
+      "field": "message",
+      "add_to_root": true
+    }
+  },
+  {
+    "script": {
+      "lang": "painless",
+      "source": "\nvoid renameField(def ctx, def old, def newF) {\n   def names = old.splitOnToken(\".\");\n   def value = ctx[names[0]][names[1]];\n   ctx[newF] = value ;\n}\n\ndef fields = ctx.keySet();\ndef type = null;\n\nfor (field in fields) {\n\n  if (field.contains(\"new_int_conn\")) {\n    type = \"Internal Connection\";\n    \n    renameField(ctx,\"new_int_conn.id\",\"proxy_connection_id\");\n    renameField(ctx,\"new_int_conn.srcip\",\"srcip\");\n    renameField(ctx,\"new_int_conn.srcp\",\"srcp\");\n    renameField(ctx,\"new_int_conn.trgip\",\"trgip\");\n    renameField(ctx,\"new_int_conn.trgp\",\"trgp\");\n    renameField(ctx,\"new_int_conn.hname\",\"hname\");\n    renameField(ctx,\"new_int_conn.bdb_name\",\"bdb_name\");\n    renameField(ctx,\"new_int_conn.bdb_uid\",\"bdb_uid\");\n    break;\n  }\n  else if (field.contains(\"new_conn\")) {\n    type = \"External Connection\";\n   \n    renameField(ctx,\"new_conn.id\",\"proxy_connection_id\");\n    renameField(ctx,\"new_conn.srcip\",\"srcip\");\n    renameField(ctx,\"new_conn.srcp\",\"srcp\");\n    renameField(ctx,\"new_conn.trgip\",\"trgip\");\n    renameField(ctx,\"new_conn.trgp\",\"trgp\");\n    renameField(ctx,\"new_conn.hname\",\"hname\");\n    renameField(ctx,\"new_conn.bdb_name\",\"bdb_name\");\n    renameField(ctx,\"new_conn.bdb_uid\",\"bdb_uid\");\n\n    break;\n  }\n  else if (field.contains(\"close_conn\")) {\n    type = \"Close Connection\";\n   \n    renameField(ctx,\"close_conn.id\",\"proxy_connection_id\");\n    renameField(ctx,\"close_conn.srcip\",\"srcip\");\n    renameField(ctx,\"close_conn.srcp\",\"srcp\");\n    renameField(ctx,\"close_conn.trgip\",\"trgip\");\n    renameField(ctx,\"close_conn.trgp\",\"trgp\");\n    renameField(ctx,\"close_conn.hname\",\"hname\");\n    renameField(ctx,\"close_conn.bdb_name\",\"bdb_name\");\n    renameField(ctx,\"close_conn.bdb_uid\",\"bdb_uid\");\n    break;\n  }\n  else if (field.contains(\"action\")) {\n    type = \"Auth\";\n    \n    def value = ctx[\"id\"];\n    ctx[\"proxy_connection_id\"] = value ;\n    break;\n  }\n  \n}\n\nfields = null;\n\nif (type == \"Internal Connection\" ) {\n  ctx.entrySet().removeIf(e -> e.getKey() =~ /new_int_conn.*/);\n}\nelse  if (type == \"External Connection\" ) {\n  ctx.entrySet().removeIf(e -> e.getKey() =~ /new_conn.*/);\n}\nelse if (type == \"Close Connection\" ) {\n  ctx.entrySet().removeIf(e -> e.getKey() =~ /close_conn.*/);\n}\n\nctx[\"redis_audit_event_type\"] = type;\n         "
+    }
+  },
+  {
+    "date": {
+      "field": "ts",
+      "formats": [
+        "UNIX"
+      ]
+    }
+  }
+]
