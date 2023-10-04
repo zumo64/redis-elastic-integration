@@ -211,18 +211,18 @@ services:
     
 
 
-  # Lets not use this .. redis output direct to esagent  
-  # ncat:
-  #   build:
-  #     context: .
-  #     dockerfile: Dockerfile
-  #   tty: true
-  #   ports:
-  #     - "8500:8500"
-  #   command: >
-  #     bash -c '
-  #       ncat -lk 8500 ;
-  #    '
+  Lets not use this .. redis output direct to esagent  
+  ncat:
+    build:
+      context: ./ncat
+      dockerfile: Dockerfile
+    tty: true
+    ports:
+      - "8500:8500"
+    command: >
+      bash -c '
+        ncat -lk 8500 ;
+     '
 
 
 volumes:

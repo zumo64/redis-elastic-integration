@@ -140,7 +140,6 @@ services:
 
 
   re1:
-    #image: redislabs/redis:6.4.2-94
     image: redislabs/redis:latest
     container_name: re1
     restart: unless-stopped
@@ -153,7 +152,7 @@ services:
       - 19443:9443
       - 10670:10670
       - 10671:10671
-    mem_limit: 4000m
+    mem_limit: ${MEM_LIMIT}
     volumes:
       - ./test:/tmp
 

@@ -1,12 +1,12 @@
 {
-  "id": "redis-external-connections_v4",
+  "id": "redis-external-connections_v5",
   "authorization": {
     "roles": [
       "superuser"
     ]
   },
   "version": "8.9.1",
-  "create_time": 1695398631607,
+  "create_time": 1696155253041,
   "source": {
     "index": [
       "logs-*"
@@ -25,28 +25,34 @@
                           "filter": [
                             {
                               "bool": {
-                                "must": [],
                                 "filter": [
                                   {
                                     "bool": {
-                                      "should": [
+                                      "must": [],
+                                      "filter": [
                                         {
-                                          "term": {
-                                            "data_stream.dataset": {
-                                              "value": "tcp.generic"
-                                            }
+                                          "bool": {
+                                            "should": [
+                                              {
+                                                "term": {
+                                                  "data_stream.dataset": {
+                                                    "value": "tcp.generic"
+                                                  }
+                                                }
+                                              }
+                                            ],
+                                            "minimum_should_match": 1
                                           }
                                         }
                                       ],
-                                      "minimum_should_match": 1
-                                    }
-                                  }
-                                ],
-                                "should": [],
-                                "must_not": [
-                                  {
-                                    "match_phrase": {
-                                      "redis_audit_event_type": "Internal Connection"
+                                      "should": [],
+                                      "must_not": [
+                                        {
+                                          "match_phrase": {
+                                            "redis_audit_event_type": "Internal Connection"
+                                          }
+                                        }
+                                      ]
                                     }
                                   }
                                 ]
@@ -125,7 +131,7 @@
             "min": "@timestamp.min.value",
             "max": "@timestamp.max.value"
           },
-          "script": "params.max - params.min"
+          "script": "(params.max - params.min)/1000"
         }
       },
       "status.terms": {
