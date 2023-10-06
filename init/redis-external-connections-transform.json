@@ -1,12 +1,4 @@
 {
-  "id": "redis-external-connections_v5",
-  "authorization": {
-    "roles": [
-      "superuser"
-    ]
-  },
-  "version": "8.9.1",
-  "create_time": 1696155253041,
   "source": {
     "index": [
       "logs-*"

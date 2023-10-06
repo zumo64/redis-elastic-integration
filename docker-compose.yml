@@ -55,10 +55,21 @@ services:
         until curl -s --cacert config/certs/ca/ca.crt https://es01:9200 | grep -q "missing authentication credentials"; do sleep 30; done;
         echo "Setting kibana_system password";
         until curl -s -X POST --cacert config/certs/ca/ca.crt -u "elastic:${ELASTIC_PASSWORD}" -H "Content-Type: application/json" https://es01:9200/_security/user/kibana_system/_password -d "{\"password\":\"${KIBANA_PASSWORD}\"}" | grep -q "^{}"; do sleep 10; done;
-        echo "Creating redis slow log index template";
-        curl -s -X POST --cacert config/certs/ca/ca.crt -u "elastic:${ELASTIC_PASSWORD}" -H "Content-Type: application/json" https://es01:9200/_index_template/redis_slow_logs_index_template --data "@/tmp/template.json";
         echo "Waiting for Kibana availability ..";
         until curl -s -I http://kibana:5601 | grep -q "HTTP/1.1 302 Found" ; do sleep 30; done;
+        echo "Loading Saved Objects";
+        until curl -s -I http://kibana:5601 | grep -q "HTTP/1.1 302 Found" ; do sleep 30; done;
+        curl -X POST http://kibana:5601/api/saved_objects/_import?overwrite=true -k -u "elastic:password" -H "kbn-xsrf: true" --form file=@/tmp/saved_objects.ndjson;
+        echo "Creating redis Audit Logs ingest pipeline";
+        curl -s -X PUT --cacert config/certs/ca/ca.crt -u "elastic:${ELASTIC_PASSWORD}" -H "Content-Type: application/json" https://es01:9200/_ingest/pipeline/logs-tcp.generic@custom --data-binary "@/tmp/logs-tcp.generic-ingest.json";       
+        echo "Creating  External Connections index template";
+        curl -s -X POST --cacert config/certs/ca/ca.crt -u "elastic:${ELASTIC_PASSWORD}" -H "Content-Type: application/json" https://es01:9200/_index_template/redis_externnal_connections_template --data "@/tmp/external_connections_template.json";
+        echo "Creating  External Connections Index";
+        curl -s -X PUT --cacert config/certs/ca/ca.crt -u "elastic:${ELASTIC_PASSWORD}" -H "Content-Type: application/json" https://es01:9200/redis-external-connections;
+        echo "Creating Transform";
+        curl -s -X PUT --cacert config/certs/ca/ca.crt -u "elastic:${ELASTIC_PASSWORD}" -H "Content-Type: application/json" https://es01:9200/_transform/redis-external-connections_v5 --data-binary "@/tmp/redis-external-connections-transform.json";
+        echo "Starting the Transform";
+        curl -s -X POST --cacert config/certs/ca/ca.crt -u "elastic:${ELASTIC_PASSWORD}" -H "Content-Type: application/json" https://es01:9200/_transform/redis-external-connections_v5/_start;
         echo "All done!";
       '
     healthcheck:

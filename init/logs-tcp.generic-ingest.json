@@ -1,9 +1,5 @@
-# Ingest Pipeline inlude 3 processors 
-# JSON converts the JSON inside the incoming message
-# Script (painless) to flatten the event logs 
-# Date 
 {
-  "processors":[
+  "processors": [
     {
       "json": {
         "field": "message",

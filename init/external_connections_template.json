@@ -1,0 +1,74 @@
+{
+  "version": "1.0",
+  "index_patterns": [
+    "redis-external-connections"
+  ],
+  "template": {
+    "settings": {
+      "number_of_shards": 1
+    },
+    "mappings": {
+      "properties": {
+        "@timestamp": {
+          "properties": {
+            "max": {
+              "type": "date"
+            },
+            "min": {
+              "type": "date"
+            }
+          }
+        },
+        "bdb_name": {
+          "type": "keyword"
+        },
+        "duration": {
+          "type": "float"
+        },
+        "proxy_connection_id": {
+          "type": "keyword"
+        },
+        "redis_audit_event_type": {
+          "properties": {
+            "cardinality": {
+              "type": "long"
+            },
+            "terms": {
+              "properties": {
+                "Auth": {
+                  "type": "long"
+                },
+                "Close Connection": {
+                  "type": "long"
+                },
+                "External Connection": {
+                  "type": "long"
+                }
+              }
+            }
+          }
+        },
+        "srcip": {
+          "type": "keyword"
+        },
+        "srcp": {
+          "type": "keyword"
+        },
+        "status": {
+          "properties": {
+            "terms": {
+              "properties": {
+                "0": {
+                  "type": "long"
+                },
+                "8": {
+                  "type": "long"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
