@@ -11,12 +11,12 @@ docker-compose up
 
 # Create API KEY for the elastic agent
 
-login to Kibana https://localhost:5601/ using elastic/password credentials, go to Stack Management and follow instruction on this (page)[https://www.elastic.co/guide/en/fleet/8.9/grant-access-to-elasticsearch.html#create-api-key-standalone-agent]
+login to Kibana https://localhost:5601/ using elastic/password credentials, go to Stack Management and follow instruction on this [page](https://www.elastic.co/guide/en/fleet/8.9/grant-access-to-elasticsearch.html#create-api-key-standalone-agent)
 to create an API key for the Elatic agent connect to Elasticsearch.
 
-create the Key called "my-agent-key" with the create API Key Kibana oprion in Stack Management
+create a Key called "my-agent-key" (for example) using the create API Key Kibana oprton in Stack Management
 
-Paste the API key (Beat Format) in place of the previous one in config/elastic-agent.yml
+Paste the generated API key (Beat Format) in place of the previous one in config/elastic-agent.yml
 Restart the esagent container so it uses that key:
 
 ```
