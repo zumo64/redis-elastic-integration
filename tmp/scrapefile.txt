@@ -542,3 +542,22 @@ PUT _transform/redis-external-connections_v2
 
 Connextion  open at a given time
 @timestamp.max >= "2023-09-18T15:16:00.000"
+
+
+# edit witout vi
+cat <<- "EOF" > file.txt //
+// paste edited content
+EOF
+
+curl -s -X POST --cacert config/certs/ca/ca.crt -u "elastic:${ELASTIC_PASSWORD}" -H "Content-Type: application/json" https://localhost:5601/_security/api_key --data "@/tmp/api_key.json"
+
+
+
+output=$(curl -s -X POST --cacert config/certs/ca/ca.crt -u "elastic:${ELASTIC_PASSWORD}" -H "Content-Type: application/json" https://es01:9200/_security/api_key --data "@/tmp/api-key.json") && id=$(echo $output |  grep -o '"id":"[^"]*' | awk -F ':"' '{print $2}') && apikey=$(echo $output | grep -o '"api_key":"[^"]*' | awk -F ':"' '{print $2}') && api_key="$id:$apikey" && sed -i "0,/APIKEY/s//$api_key/"
+
+
+echo "Creating audit agent API Key and applying changes to Audit agent yml ";
+output=$(curl -s -X POST --cacert config/certs/ca/ca.crt -u "elastic:${ELASTIC_PASSWORD}" -H "Content-Type:application/json" https://es01:9200/_security/api_key --data "@/tmp/api_key.json") && id=$(echo $output |  grep -o '"id":"[^"]*' | awk -F ':"' '{print $2}') && apikey=$(echo $output | grep -o '"api_key":"[^"]*' | awk -F ':"' '{print $2}') && api_key="$id:$apikey" && sed -i "0,/APIKEY/s//$api_key/" /tmp/agent-config/elastic-agent.yml;
+        
+
+| awk -F ":\"" "{print $$2}"
