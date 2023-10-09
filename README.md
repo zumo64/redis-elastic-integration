@@ -18,9 +18,7 @@ When the RE container is started up you can start set up Redis and enable the au
 Setup Redis Enterprise with audit logs. 
 That can be done manually using the rladmin commands or executing the script in  ./test/setup.sh.
 
-The commands are located in `./test/setup.sh`  
-
-On a shell terminal (in the redis container)  do the follwing:  
+In a shell terminal (in the redis container)  run the commands located in the script `./test/setup.sh`  
 
 ```
 # inside the re1 container use the following commands to:
@@ -56,8 +54,9 @@ After selecting an appropriate time range, you can :
 
 * Select the database metrics , or include all databases
 * Display connections still open or only the closed connections by toggling the filter `Connections Closed` Include/Exclude results
-* Select a source IP addess  Tag Cloud of external source IPs 
+* Select a source IP addess in the Tag Cloud of external source IPs connected (during the time range)
 * See the Authorized/ Not Authorized authentications per database
+* View an histogram of the connection durations and select a time range  
 
 ALl the internal connections are filtered out 
 
