@@ -30,7 +30,7 @@ for arg in "$@"; do
   fi
 
 
-  # ./setup.sh --connect <dbuid> <nb repeat> 
+  # ./setup.sh --run-connect <dbuid> <nb repeat> 
   if [ "$arg" == "--run-connect" ]; then
     echo "testing connection ..."
     delay=$(( $RANDOM % 100 + 1 ))

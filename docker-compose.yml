@@ -186,7 +186,7 @@ services:
     restart: always
     user: root # note, synthetic browser monitors require this set to `elastic-agent`
     volumes:
-      - ./config/elastic-agent.yml:/usr/share/elastic-agent/elastic-agent.yml
+      - ./config/elastic-agent-key.yml:/usr/share/elastic-agent/elastic-agent.yml
       - certs:/usr/share/elastic-agent/certs
     
 
