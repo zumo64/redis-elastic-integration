@@ -9,34 +9,18 @@ docker-compose up
 
 ``` 
 
-# Create API KEY for the elastic agent
-
-login to Kibana https://localhost:5601/ using elastic/password credentials, go to Stack Management and follow instruction on this [page](https://www.elastic.co/guide/en/fleet/8.9/grant-access-to-elasticsearch.html#create-api-key-standalone-agent)
-to create an API key for the Elatic agent connect to Elasticsearch.
-
-create a Key called "my-agent-key" (for example) using the create API Key Kibana oprton in Stack Management
-
-Paste the generated API key (Beat Format) in place of the previous one in config/elastic-agent.yml
-Restart the esagent container so it uses that key:
-
-```
-# stop and remove esagent 
-docker-compose down esagent
-
-# refresh with new API key value
-docker-compose pull esagent 
-
-# start esagent container
-docker-compose up esagent -d
-```
+When the RE container is started up you can start set up Redis and enable the audit logs. Check next section.
 
 
 
+# Setup RE cluster
 
-# Setup RE cluster and Database
+Setup Redis Enterprise with audit logs. 
+That can be done manually using the rladmin commands or executing the script in  ./test/setup.sh.
 
-Setup Redis Enterprise with audit logs. The commands are located in ./test/setup.sh. 
-On a terminal on the redis container do the follwing:  
+The commands are located in `./test/setup.sh`  
+
+On a shell terminal (in the redis container)  do the follwing:  
 
 ```
 # inside the re1 container use the following commands to:
@@ -45,23 +29,28 @@ On a terminal on the redis container do the follwing:
 # run a test that connects to boths  databases randomly so we can see events in Kibana 
 
 cd /tmp
+# Create a 1 node cluster and enable audit logs
 ./setup.sh --create-cluster
+
+# create 2 databases for testing
 ./setup.sh --create-db
 
 # check every thing is OK
 rladlmin status
 
-# Generate connections to the 2 databases created above
+# Generate connections (random duration) to the 2 databases created above
 ./setup.sh --run-connect 1 50 &
 ./setup.sh --run-connect 2 50 &
 
 
 ````
 
+Note1: Sometimes the REST commands report a connection failure to `localhost` In that case, try again a few times and usually it worls..   use the container IP address otherwise.
+Note2: the random number generation doesn't work as well as expected 
 
 # Visualize dashboard
 
-Give it a few minutes (5 minutes) to let the transform kick in and aggregate enough metrics then open Kibana Dashboard "Redis Connection Status"
+Give it a few minutes (5 minutes) to let the transform kick in and aggregate enough metrics then open Kibana Dashboard `Redis Connection Status`
 
 You can use the following things :
 
