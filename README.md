@@ -48,22 +48,26 @@ rladlmin status
 Note1: Sometimes the REST commands report a connection failure to `localhost` In that case, try again a few times and usually it worls..   use the container IP address otherwise.
 Note2: the random number generation doesn't work as well as expected 
 
-# Visualize dashboard
+# Connections Dashboard
 
-Give it a few minutes (5 minutes) to let the transform kick in and aggregate enough metrics then open Kibana Dashboard `Redis Connection Status`
+Give the connections events  5-10 minutes run, then open Kibana Dashboard `Redis Connection Status` 
 
-You can use the following things :
+After selecting an appropriate time range, you can :
 
-* Select a time range
-* Select which database you want to audit , or all databases
-* Filter connetions still open or only the closed connections
-* You will see a Tag Cloud of external source IPs 
+* Select the database metrics , or include all databases
+* Display connections still open or only the closed connections by toggling the filter `Connections Closed` Include/Exclude results
+* Select a source IP addess  Tag Cloud of external source IPs 
 * See the Authorized/ Not Authorized authentications per database
 
 ALl the internal connections are filtered out 
 
 
-Coming soon : more logs and some alerts
+Coming soon : 
+* Additional Logs including Slow logs
+* connection Spans
+* Alerts
+
+![Dashboard Screenshot](https://github.com/zumo64/redis-elastic-integration/blob/main/dashboard.png)
 
 
 
