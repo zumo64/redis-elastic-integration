@@ -81,10 +81,26 @@ services:
       timeout: 5s
       retries: 120
 
+  # this was added because of an issue with docker-desktop 4.25.0 
+  # check https://github.com/docker/for-mac/issues/7047
+  # please remove if not needed including the depends_on in es01
+  fixsysctl:
+    restart: "no"
+    privileged: true
+    deploy:
+      replicas: 1
+      resources:
+        limits:
+          memory: 25m
+    image: centos:7
+    command: "sysctl -w vm.max_map_count=262144"
+
   es01:
     depends_on:
       setup:
         condition: service_healthy
+      fixsysctl:
+        condition: service_completed_successfully    
     image: docker.elastic.co/elasticsearch/elasticsearch:${STACK_VERSION}
     volumes:
       - certs:/usr/share/elasticsearch/config/certs

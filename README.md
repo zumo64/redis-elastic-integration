@@ -9,11 +9,11 @@ docker-compose up
 
 ``` 
 
-When the RE container is started up you can start set up Redis and enable the audit logs. Check next section.
+When the RE container is started up you can start setting up Redis and enable the audit logs. Check next section.
 
 
 
-# Setup RE cluster
+# Setup a RE cluster
 
 Setup Redis Enterprise with audit logs. 
 That can be done manually using the rladmin commands or executing the script in  ./test/setup.sh.
@@ -34,7 +34,7 @@ cd /tmp
 ./setup.sh --create-db
 
 # check every thing is OK
-rladlmin status
+rladmin status
 
 # Generate connections (random duration) to the 2 databases created above
 ./setup.sh --run-connect 1 50 &
@@ -43,8 +43,9 @@ rladlmin status
 
 ````
 
-Note1: Sometimes the REST commands report a connection failure to `localhost` In that case, try again a few times and usually it worls..   use the container IP address otherwise.
-Note2: the random number generation doesn't work as well as expected 
+Note1: Sometimes the REST commands report a connection failure to `localhost` In that case, try again a few times and usually it will work..    use the container IP address otherwise.
+
+Note2: the random number generation (for random connection times) doesn't work as well as expected  TODO fix it
 
 # Connections Dashboard
 

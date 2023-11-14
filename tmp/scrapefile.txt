@@ -561,3 +561,107 @@ output=$(curl -s -X POST --cacert config/certs/ca/ca.crt -u "elastic:${ELASTIC_P
         
 
 | awk -F ":\"" "{print $$2}"
+
+
+
+VEGA VISUALISATION
+{
+/*
+
+Welcome to Vega visualizations.  Here you can design your own dataviz from scratch using a declarative language called Vega, or its simpler form Vega-Lite.  In Vega, you have the full control of what data is loaded, even from multiple sources, how that data is transformed, and what visual elements are used to show it.  Use help icon to view Vega examples, tutorials, and other docs.  Use the wrench icon to reformat this text, or to remove comments.
+
+This example graph shows the document count in all indexes in the current time range.  You might need to adjust the time filter in the upper right corner.
+
+
+
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "description": "A simple bar chart with ranged data (aka Gantt Chart).",
+  "data": {
+    "values": [
+      {"connection": "8C1287", "start": "2015-03-07 12:32:17", "end": "2015-03-07 12:33:17"},
+      {"connection": "871D87", "start": "2015-03-07 12:30:17", "end": "2015-03-07 12:35:17"},
+      {"connection": "8J128E", "start": "2015-03-07 12:37:17", "end": "2015-03-07 12:39:17"},
+      {"connection": "8B1287", "start": "2015-03-07 12:37:27", "end": "2015-03-07 12:39:40"}
+    ]
+  },
+  "mark": "bar",
+  "encoding": {
+    "y": {"field": "connection", "type": "ordinal"},
+    "x": {"field": "start", "type": "temporal"},
+    "x2": {"field": "end"}
+  }
+}
+
+*/
+
+  $schema: https://vega.github.io/schema/vega-lite/v5.json
+  title: Event counts from all indexes
+
+  // Define the data source
+  data: {
+    url: {
+      index: redis-external-connections
+       
+      body: {
+        query: {
+          bool: {
+            must: [
+            ]
+            filter: [
+              {
+                range: {
+                  @timestamp.min: {
+                    //"format": "strict_date_optional_time",
+                    gte: {
+                      %timefilter%: min
+                    }
+                    lte: {
+                      %timefilter%: max
+                    }
+                  }
+                }
+              }
+            ]
+            should: [
+            ]
+            must_not: [
+              {
+                match_phrase: {
+                  redis_audit_event_type.cardinality: "1"
+                }
+              }
+            ]
+          }
+        }
+      }
+    }
+  
+    format: { property: "hits.hits"}
+    
+  }
+
+  // "mark" is the graphics element used to show our data.  Other mark values are: area, bar, circle, line, point, rect, rule, square, text, and tick.  See https://vega.github.io/vega-lite/docs/mark.html
+  mark: bar
+
+  // "encoding" tells the "mark" what data to use and in what way.  See https://vega.github.io/vega-lite/docs/encoding.html
+  encoding: {
+    y: {
+      field: _source.proxy_connection_id
+      type: ordinal
+    }
+    x: {
+      field: _source.@timestamp.min
+      type: temporal
+    }
+    x2: {
+      field: _source.@timestamp.max
+      type: temporal
+    }
+  }
+}
+
+
+
+Issue with es01 not statung due docker-desktop 4.25
+https://github.com/docker/for-mac/issues/7047
