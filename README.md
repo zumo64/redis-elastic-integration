@@ -1,3 +1,8 @@
+# Objective
+POC using the Elastic Stack to parse and visualise redis Enterprise logs.
+The following logs are currently ingested :
+* Audit logs
+* more to come
 
 # Setup Containers
 
