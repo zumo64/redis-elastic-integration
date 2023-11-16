@@ -69,7 +69,6 @@ ALl the internal connections are filtered out
 
 Coming soon : 
 * Additional Logs including Slow logs
-* connection Spans
 * Alerts
 
 ![Dashboard Screenshot](https://github.com/zumo64/redis-elastic-integration/blob/main/dashboard.png)
